@@ -25,6 +25,7 @@ local Cell = {
   index,
   isAlive,
   isAliveForTheNextGeneration,
+  lifetime,
 
 
   new = function(self, i, j, index)
@@ -38,6 +39,7 @@ local Cell = {
     _cell.x = (i -1) * CELL_SIZE
     _cell.y = (j -1) * CELL_SIZE
     _cell.index = index
+    _cell.lifetime = 0
 
     if math.random() < 0.2 then
       _cell.isAlive = true
@@ -49,6 +51,7 @@ local Cell = {
   end,
 
   update = function(self, dt)
+
     local nbOfAliveNeighboors = self:getNbOfAliveNeighboors()
 
     if self.isAlive and (nbOfAliveNeighboors == 2 or nbOfAliveNeighboors == 3) then
@@ -58,22 +61,22 @@ local Cell = {
     else
       self.isAliveForTheNextGeneration = false
     end
+
+    if self.isAliveForTheNextGeneration then
+      self.lifetime = self.lifetime + dt
+    else
+      self.lifetime = 0
+    end
+
   end,
 
   draw = function(self)
     love.graphics.push()
 
     if self.isAlive then
-      love.graphics.setColor(0, 0, 0, 1)
-    else
-      love.graphics.setColor(1, 1, 1, 1)
+      love.graphics.setColor(1, 1, 1)
+      love.graphics.circle('fill', self.x + CELL_SIZE/2, self.y + CELL_SIZE/2, CELL_SIZE/2, 16)
     end
-
-
-    love.graphics.rectangle('fill', self.x, self.y, CELL_SIZE, CELL_SIZE)
-
-    love.graphics.setColor(0, 0, 0, 1)
-    love.graphics.rectangle('line', self.x, self.y, CELL_SIZE, CELL_SIZE)
 
     love.graphics.pop()
   end,
